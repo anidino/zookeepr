@@ -9,6 +9,7 @@ const PORT = process.env.PORT || 3001;
 
 const app = express();    ///these two steps instantiate the server then tell it to listen for requests 
 
+app.use(express.static("public"));    // use express.static method and provide file path (public folder) and instruct server to make these files static resources
 //parse incoming string or array data
 app.use(express.urlencoded({ extended: true }))  // Express.js method that takes incoming POST data and converts to key/value parirings that can be accssed in the req.body object. 
 // parse incoming JSON data
@@ -73,6 +74,22 @@ function createNewAnimal(body, animalsArray) {
     return animal;
 }
 
+function validateAnimal(animal) {
+    if (!animal.name || typeof animal.name !== 'string') {
+        return false;
+    }
+    if (!animal.species || typeof animal.species !== 'string') {
+        return false;
+    }
+    if (!animal.diet || typeof animal.diet !== 'string') {
+        return false;
+    }
+    if (!animal.personalityTraits || !Array.isArray(animal.personalityTraits)) {
+        return false;
+    }
+    return true;
+}
+
 
 // adding the routes here /// 
 app.get('/api/animals', (req, res) => {
@@ -110,21 +127,21 @@ app.post('/api/animals', (req, res) => {
 });
 
 
-function validateAnimal(animal) {
-    if (!animal.name || typeof animal.name !== 'string') {
-        return false;
-    }
-    if (!animal.species || typeof animal.species !== 'string') {
-        return false;
-    }
-    if (!animal.diet || typeof animal.diet !== 'string') {
-        return false;
-    }
-    if (!animal.personalityTraits || !Array.isArray(animal.personalityTraits)) {
-        return false;
-    }
-    return true;
-}
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/index.html'));
+});
+
+app.get('/animals', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/animals.html'));
+});
+
+app.get('/zookeepers', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/zookeepers.html'));
+});
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/index.html'));
+});
 
 app.listen(PORT, () => {
     console.log(`API server now on ${PORT}!`);
